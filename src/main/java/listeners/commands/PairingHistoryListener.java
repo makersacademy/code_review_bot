@@ -27,14 +27,21 @@ public class PairingHistoryListener implements SlashCommandHandler {
         }
 
         String userName = cmd.replace("@", "");
-        String response = buildResponse(userName, PairingHistory.getHistory(userName));
+        UsersListResponse usersList = ctx.client().usersList(r -> r);
+
+        String userId = getUserId(usersList, userName);
+        if (userId.equals("Not found")) {
+            return ctx.ack("Error: no such user in this workspace");
+        }
+
+        String response = buildResponse(userId, PairingHistory.getHistory(userId));
         return ctx.ack(response);
     }
 
-    private String buildResponse(String userName, ArrayList<Pairing> history) {
+    private String buildResponse(String userId, ArrayList<Pairing> history) {
         StringBuilder output = new StringBuilder();
         for (Pairing pairing : history) {
-            output.append(pairing.stringFor(userName));
+            output.append(pairing.stringFor(userId));
             output.append("\n");
         }
         return output.isEmpty() ? "This student has not yet paired." : output.toString();
@@ -47,25 +54,12 @@ public class PairingHistoryListener implements SlashCommandHandler {
         return user.isAdmin();
     }
 
-    private String getUserId(SlashCommandContext ctx, String userName) throws SlackApiException, IOException {
-        UsersListResponse response = ctx.client().usersList(r -> r);
+    private String getUserId(UsersListResponse response, String userName) {
         Optional<User> user = response.getMembers().stream()
                 .filter(u -> userName.equals(u.getName()))
                 .findFirst();
         return user.map(User::getId).orElse("Not found");
     }
-    //
-    //    private String getUserName(SlashCommandContext ctx, String userId) throws SlackApiException, IOException {
-    //        System.out.println("TRYING TO GET USERNAME");
-    //        System.out.println(String.format("trying with userId: %s ...", userId));
-    //        UsersListResponse response = ctx.client().usersList(r -> r);
-    //        System.out.println("RESPONSE IS:");
-    //        System.out.println(response);
-    //        Optional<User> user = response.getMembers().stream()
-    //                .filter(u -> userId.equals(u.getId()))
-    //                .findFirst();
-    //        return user.map(User::getName).orElse("Not found");
-    //    }
 
     private boolean commandHasErrors(String text) {
         System.out.println(String.format("The text you tried was: %s", text));

@@ -15,8 +15,8 @@ public class Pairing {
         this.datetime = datetime;
     }
 
-    public String stringFor(String student) {
-        String pair = student.equals(studentA) ? studentB : student.equals(studentB) ? studentA : "unknown student";
-        return String.format("Paired with %s in channel %s on %s", pair, channelName, datetime);
+    public String stringFor(String studentId) {
+        String pair = studentId.equals(studentA) ? studentB : studentId.equals(studentB) ? studentA : "unknown student";
+        return String.format("Paired with <@%s> in channel %s on %s", pair, channelName, datetime);
     }
 }

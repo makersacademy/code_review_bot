@@ -2,6 +2,7 @@ package listeners.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload;
 import com.slack.api.bolt.context.builtin.SlashCommandContext;
 import com.slack.api.bolt.handler.builtin.SlashCommandHandler;
 import com.slack.api.bolt.request.builtin.SlashCommandRequest;
@@ -15,13 +16,14 @@ import utils.CodeSubmission;
 public class CodeReviewListener implements SlashCommandHandler {
     @Override
     public Response apply(SlashCommandRequest req, SlashCommandContext ctx) throws IOException {
-        String channelId = ctx.getChannelId();
-        String channelName = req.getPayload().getChannelName();
-        String userId = req.getPayload().getUserId();
-        String userName = req.getPayload().getUserName();
-        String code = req.getPayload().getText();
-        CodeSubmission currentSubmission = new CodeSubmission(userId, userName, code);
+        SlashCommandPayload payload = req.getPayload();
 
+        String channelId = payload.getChannelId();
+        String channelName = payload.getChannelName();
+        String userId = payload.getUserId();
+        String code = payload.getText();
+
+        CodeSubmission currentSubmission = new CodeSubmission(userId, code);
         Queue<CodeSubmission> submissionQueue = readQueue(channelId);
 
         if (submissionQueue.isEmpty()) {
@@ -42,7 +44,7 @@ public class CodeReviewListener implements SlashCommandHandler {
             updateQueue(channelId, submissionQueue);
             createPairChannel(ctx, currentSubmission, pairedSubmission);
             logPairing(channelName, currentSubmission, pairedSubmission);
-            return ctx.ack("You have been paired with " + pairedSubmission.userName + ". Check your DMs!");
+            return ctx.ack("You have been paired with <@" + pairedSubmission.userId + ">. Check your DMs!");
         }
     }
 
@@ -54,8 +56,8 @@ public class CodeReviewListener implements SlashCommandHandler {
             String channelId = response.getChannel().getId();
             ctx.client().chatPostMessage(r -> r.channel(channelId)
                     .text("You've been paired for peer review!\n\n"
-                            + "*Code from <@" + a.userName + ">*:\n" + a.code + "\n\n"
-                            + "*Code from <@" + b.userName + ">*:\n" + b.code + "\n\n"
+                            + "*Code from <@" + a.userId + ">*:\n" + a.code + "\n\n"
+                            + "*Code from <@" + b.userId + ">*:\n" + b.code + "\n\n"
                             + "### Peer Review Guidance:\n"
                             + "- Review the code for clarity and best practices.\n"
                             + "- Provide constructive feedback.\n"
@@ -68,7 +70,7 @@ public class CodeReviewListener implements SlashCommandHandler {
     private void logPairing(String channelName, CodeSubmission a, CodeSubmission b) {
         String fileName = "pairing_history.csv";
         try (FileWriter fw = new FileWriter(fileName, true)) {
-            fw.append(a.userName + "," + b.userName + "," + channelName + "," + new Date() + "\n");
+            fw.append(a.userId + "," + b.userId + "," + channelName + "," + new Date() + "\n");
             fw.flush();
         } catch (IOException e) {
             e.printStackTrace();

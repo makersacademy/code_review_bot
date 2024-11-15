@@ -13,7 +13,7 @@ import org.apache.commons.csv.CSVRecord;
 public class PairingHistory {
     public static String filePath = "pairing_history.csv";
 
-    public static ArrayList<Pairing> getHistory(String userName) {
+    public static ArrayList<Pairing> getHistory(String userId) {
         ArrayList<Pairing> pairings = new ArrayList<>();
 
         try (FileReader reader = new FileReader(filePath);
@@ -29,7 +29,7 @@ public class PairingHistory {
                 String channelName = record.get("channelName");
                 Date datetime = toDate(record.get("datetime"));
 
-                if (studentA.equals(userName) || studentB.equals(userName)) {
+                if (studentA.equals(userId) || studentB.equals(userId)) {
                     pairings.add(new Pairing(studentA, studentB, channelName, datetime));
                 }
             }
