@@ -15,7 +15,7 @@ src/main/webapp/WEB-INF/lib/
 downloaded_files/
 node_modules/
 typescript-types/dist/
-
+channelSubmissions/
 logs/
 
 .DS_Store

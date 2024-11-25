@@ -27,15 +27,18 @@ public class PairingHistoryListener implements SlashCommandHandler {
         }
 
         String userName = cmd.replace("@", "");
-        UsersListResponse usersList = ctx.client().usersList(r -> r);
+        try {
+            UsersListResponse usersList = ctx.client().usersList(r -> r);
+            String userId = getUserId(usersList, userName);
+            if (userId.equals("Not found")) {
+                return ctx.ack("Error: no such user in this workspace");
+            }
 
-        String userId = getUserId(usersList, userName);
-        if (userId.equals("Not found")) {
-            return ctx.ack("Error: no such user in this workspace");
+            String response = buildResponse(userId, PairingHistory.getHistory(userId));
+            return ctx.ack(response);
+        } catch (SlackApiException e) {
+            return ctx.ack("Error: Too many requests for Slack API to handle. Try again in a few minutes.");
         }
-
-        String response = buildResponse(userId, PairingHistory.getHistory(userId));
-        return ctx.ack(response);
     }
 
     private String buildResponse(String userId, ArrayList<Pairing> history) {
