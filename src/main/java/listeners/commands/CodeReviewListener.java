@@ -19,9 +19,13 @@ public class CodeReviewListener implements SlashCommandHandler {
         SlashCommandPayload payload = req.getPayload();
 
         String channelId = payload.getChannelId();
+        System.out.println("Channel ID: " + channelId);
         String channelName = payload.getChannelName();
+        System.out.println("Channel Name: " + channelName);
         String userId = payload.getUserId();
+        System.out.println("User ID: " + userId);
         String code = payload.getText();
+        System.out.println("Code: " + code);
 
         CodeSubmission currentSubmission = new CodeSubmission(userId, code);
         Queue<CodeSubmission> submissionQueue = readQueue(channelId);
@@ -79,7 +83,15 @@ public class CodeReviewListener implements SlashCommandHandler {
 
     private void updateQueue(String channelId, Queue<CodeSubmission> submissionQueue) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File(pathnameFor(channelId)), submissionQueue);
+        try {
+            mapper.writeValue(new File(pathnameFor(channelId)), submissionQueue);
+        } catch (FileNotFoundException e) {
+            //            create the channelSubmissions directory
+            new File("./channelSubmissions").mkdir();
+            //            create the file
+            new File(pathnameFor(channelId)).createNewFile();
+            mapper.writeValue(new File(pathnameFor(channelId)), submissionQueue);
+        }
     }
 
     private Queue<CodeSubmission> readQueue(String channelId) throws IOException {
@@ -88,10 +100,12 @@ public class CodeReviewListener implements SlashCommandHandler {
             return mapper.readValue(new File(pathnameFor(channelId)), new TypeReference<Queue<CodeSubmission>>() {});
         } catch (FileNotFoundException e) {
             return new LinkedList<>();
+        } catch (Exception e) {
+            return new LinkedList<>();
         }
     }
 
     private String pathnameFor(String channelId) {
-        return "channelSubmissions/submissions_" + channelId + ".json";
+        return "./channelSubmissions/submissions_" + channelId + ".json";
     }
 }
