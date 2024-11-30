@@ -6,7 +6,7 @@ import listeners.ListenerProvider;
 public class CommandListeners implements ListenerProvider {
     @Override
     public void register(App app) {
-        app.command("/code-review", new CodeReviewListener());
-        app.command("/pairing-history", new PairingHistoryListener());
+        app.command("/code-review", new PeerReviewListener());
+        app.command("/pairing-history", new PeerReviewHistoryListener());
     }
 }

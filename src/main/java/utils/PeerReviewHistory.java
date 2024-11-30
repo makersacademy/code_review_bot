@@ -10,11 +10,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-public class PairingHistory {
+public class PeerReviewHistory {
     public static String filePath = "pairing_history.csv";
 
-    public static ArrayList<Pairing> getHistory(String userId) {
-        ArrayList<Pairing> pairings = new ArrayList<>();
+    public static ArrayList<PeerReviewPair> getHistory(String userId) {
+        ArrayList<PeerReviewPair> pairings = new ArrayList<>();
 
         try (FileReader reader = new FileReader(filePath);
                 CSVParser csvParser = CSVFormat.Builder.create()
@@ -30,7 +30,7 @@ public class PairingHistory {
                 Date datetime = toDate(record.get("datetime"));
 
                 if (studentA.equals(userId) || studentB.equals(userId)) {
-                    pairings.add(new Pairing(studentA, studentB, channelName, datetime));
+                    pairings.add(new PeerReviewPair(studentA, studentB, channelName, datetime));
                 }
             }
         } catch (IOException | ParseException e) {

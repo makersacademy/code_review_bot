@@ -2,13 +2,13 @@ package utils;
 
 import java.util.Date;
 
-public class Pairing {
+public class PeerReviewPair {
     public String studentA;
     public String studentB;
     public String channelName;
     public Date datetime;
 
-    public Pairing(String studentA, String studentB, String channelName, Date datetime) {
+    public PeerReviewPair(String studentA, String studentB, String channelName, Date datetime) {
         this.studentA = studentA;
         this.studentB = studentB;
         this.channelName = channelName;
