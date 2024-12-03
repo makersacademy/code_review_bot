@@ -8,5 +8,6 @@ public class CommandListeners implements ListenerProvider {
     public void register(App app) {
         app.command("/code-review", new PeerReviewListener());
         app.command("/pairing-history", new PeerReviewHistoryListener());
+        app.command("/flush-code-review-queue", new FlushCodeReviewQueueListener());
     }
 }
