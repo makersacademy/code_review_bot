@@ -27,7 +27,7 @@ public class PeerReviewListener implements SlashCommandHandler {
         String code = payload.getText();
         System.out.println("Code: " + code);
 
-        PeerReviewRequest currentSubmission = new PeerReviewRequest(userId, code);
+        PeerReviewRequest currentSubmission = new PeerReviewRequest(userId);
         Queue<PeerReviewRequest> submissionQueue = readQueue(channelId);
 
         if (submissionQueue.isEmpty()) {
@@ -42,7 +42,7 @@ public class PeerReviewListener implements SlashCommandHandler {
             // The user has resubmitted his/her code
             submissionQueue.add(currentSubmission);
             updateQueue(channelId, submissionQueue);
-            return ctx.ack("Thank you, your code has been updated! Please wait while we pair you up.");
+            return ctx.ack("Thank you! Please wait while we pair you up.");
         } else {
             // Pair the current user with the first user in the current channel's queue
             updateQueue(channelId, submissionQueue);
@@ -59,14 +59,12 @@ public class PeerReviewListener implements SlashCommandHandler {
 
             String channelId = response.getChannel().getId();
             ctx.client().chatPostMessage(r -> r.channel(channelId)
-                    .text("You've been paired for peer review!\n\n"
-                            + "*Message from <@" + a.userId + ">*:\n" + a.message + "\n\n"
-                            + "*Message from <@" + b.userId + ">*:\n" + b.message + "\n\n"
+                    .text("You've been paired for peer review! :)\n\n"
                             + "*Peer Review Guidance:*\n"
                             + "- Exchange code by sharing a file or github link.\n"
                             + "- Use this doc as a guide: https://journey.makers.tech/pages/peer-review.\n"
                             + "- Provide constructive feedback.\n"
-                            + "- Collaborate and learn from each other."));
+                            + "- Compare solutions and learn from each other."));
         } catch (IOException | SlackApiException e) {
             e.printStackTrace();
         }

@@ -4,12 +4,10 @@ import java.io.Serializable;
 
 public class PeerReviewRequest implements Serializable {
     public String userId;
-    public String message;
 
     public PeerReviewRequest() {} // default constructor (required for Jackson)
 
-    public PeerReviewRequest(String userId, String message) {
+    public PeerReviewRequest(String userId) {
         this.userId = userId;
-        this.message = message;
     }
 }
